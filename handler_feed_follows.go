@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"structs"
 	"time"
 
 	"github.com/Santiparra/Blog-Aggregator/internal/database"

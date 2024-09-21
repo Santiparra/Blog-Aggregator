@@ -13,7 +13,7 @@ import (
 )
 
 const createFeedFollow = `-- name: CreateFeedFollow :one
-INSERT INTO feeds_follows (id, created_at, updated_at, user_id, feed_id)
+INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
 VALUES($1, $2, $3, $4, $5)
 RETURNING id, created_at, updated_at, user_id, feed_id
 `
@@ -26,7 +26,7 @@ type CreateFeedFollowParams struct {
 	FeedID    uuid.UUID
 }
 
-func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (FeedsFollow, error) {
+func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (FeedFollow, error) {
 	row := q.db.QueryRowContext(ctx, createFeedFollow,
 		arg.ID,
 		arg.CreatedAt,
@@ -34,7 +34,7 @@ func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowPara
 		arg.UserID,
 		arg.FeedID,
 	)
-	var i FeedsFollow
+	var i FeedFollow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -46,7 +46,7 @@ func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowPara
 }
 
 const deleteFeedFollows = `-- name: DeleteFeedFollows :exec
-DELETE FROM feeds_follows WHERE id = $1 AND user_id = $2
+DELETE FROM feed_follows WHERE id = $1 AND user_id = $2
 `
 
 type DeleteFeedFollowsParams struct {
@@ -60,18 +60,18 @@ func (q *Queries) DeleteFeedFollows(ctx context.Context, arg DeleteFeedFollowsPa
 }
 
 const getFeedFollows = `-- name: GetFeedFollows :many
-SELECT id, created_at, updated_at, user_id, feed_id FROM feeds_follows WHERE user_id=$1
+SELECT id, created_at, updated_at, user_id, feed_id FROM feed_follows WHERE user_id=$1
 `
 
-func (q *Queries) GetFeedFollows(ctx context.Context, userID uuid.UUID) ([]FeedsFollow, error) {
+func (q *Queries) GetFeedFollows(ctx context.Context, userID uuid.UUID) ([]FeedFollow, error) {
 	rows, err := q.db.QueryContext(ctx, getFeedFollows, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []FeedsFollow
+	var items []FeedFollow
 	for rows.Next() {
-		var i FeedsFollow
+		var i FeedFollow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,

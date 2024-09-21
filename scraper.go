@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 )
 
 func startScraping(db *database.Queries, concurrency int, timeBetweenRequest time.Duration) {
-	log.Printf("Scraping on %v goroutines every %s duration", concurrency, timeBetweenRequest)
+	log.Printf("Scraping on %v goroutines every %s duration", timeBetweenRequest, concurrency)
 	ticker := time.NewTicker(timeBetweenRequest)
 	for ; ; <-ticker.C {
 		feeds, err := db.GetNextFeedsToFetch(context.Background(), int32(concurrency))
@@ -20,6 +21,7 @@ func startScraping(db *database.Queries, concurrency int, timeBetweenRequest tim
 			log.Println("error fetching feeds:", err)
 			continue
 		}
+		log.Printf("Found %v feeds to fetch!", len(feeds))
 
 		wg := &sync.WaitGroup{}
 		for _, feed := range feeds {
@@ -70,6 +72,9 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 			FeedID:      feed.ID,
 		})
 		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key") {
+				continue
+			}
 			log.Println("failed to create post:", err)
 		}
 	}

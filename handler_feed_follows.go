@@ -47,3 +47,7 @@ func (apiCfg *apiConfig) handlerGetFeedFollows(w http.ResponseWriter, r *http.Re
 
 	respondWithJSON(w, 201, databaseFeedFollowsToFeedFollows(feedFollows))
 }
+
+func (apiCfg *apiConfig) handlerDeleteFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
+	
+}

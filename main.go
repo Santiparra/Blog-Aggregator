@@ -16,8 +16,7 @@ type apiConfig struct {
 	DB *database.Queries
 }
 
-func main(){
-
+func main() {
 	godotenv.Load(".env")
 
 	port := os.Getenv("PORT")
@@ -25,7 +24,7 @@ func main(){
 		log.Fatal("PORT environment variable is not set")
 	}
 
-	dbURL := os.Getenv("DATABASE_URL")
+	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}

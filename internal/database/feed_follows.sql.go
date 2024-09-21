@@ -13,8 +13,9 @@ import (
 )
 
 const createFeedFollow = `-- name: CreateFeedFollow :one
+
 INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
-VALUES($1, $2, $3, $4, $5)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id, created_at, updated_at, user_id, feed_id
 `
 
@@ -45,26 +46,27 @@ func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowPara
 	return i, err
 }
 
-const deleteFeedFollows = `-- name: DeleteFeedFollows :exec
+const deleteFeedFollow = `-- name: DeleteFeedFollow :exec
+
 DELETE FROM feed_follows WHERE id = $1 AND user_id = $2
 `
 
-type DeleteFeedFollowsParams struct {
+type DeleteFeedFollowParams struct {
 	ID     uuid.UUID
 	UserID uuid.UUID
 }
 
-func (q *Queries) DeleteFeedFollows(ctx context.Context, arg DeleteFeedFollowsParams) error {
-	_, err := q.db.ExecContext(ctx, deleteFeedFollows, arg.ID, arg.UserID)
+func (q *Queries) DeleteFeedFollow(ctx context.Context, arg DeleteFeedFollowParams) error {
+	_, err := q.db.ExecContext(ctx, deleteFeedFollow, arg.ID, arg.UserID)
 	return err
 }
 
-const getFeedFollows = `-- name: GetFeedFollows :many
-SELECT id, created_at, updated_at, user_id, feed_id FROM feed_follows WHERE user_id=$1
+const getFeedFollowsForUser = `-- name: GetFeedFollowsForUser :many
+SELECT id, created_at, updated_at, user_id, feed_id FROM feed_follows WHERE user_id = $1
 `
 
-func (q *Queries) GetFeedFollows(ctx context.Context, userID uuid.UUID) ([]FeedFollow, error) {
-	rows, err := q.db.QueryContext(ctx, getFeedFollows, userID)
+func (q *Queries) GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([]FeedFollow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedFollowsForUser, userID)
 	if err != nil {
 		return nil, err
 	}
